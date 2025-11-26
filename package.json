@@ -1,0 +1,23 @@
+{
+  "name": "word-king-competition",
+  "version": "1.6.0",
+  "description": "单词王比赛 - 小学生英语学习平台（宝可梦主题）",
+  "main": "index.html",
+  "scripts": {
+    "dev": "python3 -m http.server 8000",
+    "preview": "python3 -m http.server 8000"
+  },
+  "keywords": [
+    "vocabulary",
+    "learning",
+    "english",
+    "pokemon",
+    "education"
+  ],
+  "author": "",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": ""
+  }
+}

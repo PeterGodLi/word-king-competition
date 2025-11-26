@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>单词王比赛 - 小学生英语学习平台</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="calendar-styles.css">
+</head>
+<body>
+    <div class="container">
+        <!-- 顶部导航 -->
+        <header class="header">
+            <h1 class="logo">⚡ 单词王比赛 ✨</h1>
+            <div class="score-board">
+                <span class="score">⭐ 得分: <strong id="totalScore">0</strong></span>
+                <span class="progress">📊 进度: <strong id="progress">0/0</strong></span>
+                <button class="slashed-btn" onclick="showSlashedManager()" title="斩词管理">
+                    ⚔️ <strong id="slashedCount">0</strong>
+                </button>
+                <button class="wrongbook-btn" onclick="showWrongBookManager()" title="错词本">
+                    📕 <strong id="wrongBookCount">0</strong>
+                </button>
+                <button class="calendar-btn" onclick="showStudyCalendar()" title="学习日历">
+                    📅 日历
+                </button>
+            </div>
+        </header>
+
+        <!-- 主菜单 -->
+        <div class="main-menu" id="mainMenu">
+            <h2>✨ 选择学习模式 ✨</h2>
+            <div class="mode-buttons">
+                <button class="mode-btn learn-btn" onclick="showCategorySelection('learn')">
+                    📚 背单词模式
+                    <span class="mode-desc">🌟 学习新单词，加深记忆</span>
+                </button>
+                <button class="mode-btn test-btn" onclick="showCategorySelection('test')">
+                    ✍️ 检查模式
+                    <span class="mode-desc">💪 测试单词拼写和记忆</span>
+                </button>
+                <button class="mode-btn challenge-btn" onclick="showCategorySelection('challenge')">
+                    ⚡ 挑战模式
+                    <span class="mode-desc">🏃 限时单词挑战赛</span>
+                </button>
+                <button class="mode-btn import-btn" onclick="showImportDialog()">
+                    📥 导入单词库
+                    <span class="mode-desc">📂 从Excel文件导入自定义单词</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Excel导入对话框 -->
+        <div class="import-dialog hidden" id="importDialog">
+            <div class="import-content">
+                <div class="import-header">
+                    <h2>📥 导入单词库</h2>
+                    <button class="btn-close" onclick="closeImportDialog()">✕</button>
+                </div>
+                
+                <div class="import-body">
+                    <!-- 文件选择区域 -->
+                    <div class="file-upload-area" id="fileUploadArea">
+                        <input type="file" id="fileInput" accept=".xlsx,.xls,.csv" style="display: none;" onchange="handleFileSelect(event)">
+                        <div class="upload-placeholder" onclick="document.getElementById('fileInput').click()">
+                            <div class="upload-icon">📁</div>
+                            <p class="upload-text">点击选择文件或拖拽文件到此处</p>
+                            <p class="upload-hint">支持 .xlsx, .xls, .csv 格式</p>
+                        </div>
+                    </div>
+
+                    <!-- 文件信息显示 -->
+                    <div class="file-info hidden" id="fileInfo">
+                        <div class="file-details">
+                            <span class="file-name" id="fileName"></span>
+                            <span class="file-size" id="fileSize"></span>
+                        </div>
+                        <button class="btn-remove" onclick="removeFile()">✕</button>
+                    </div>
+
+                    <!-- 导入进度 -->
+                    <div class="import-progress hidden" id="importProgress">
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="progressFill"></div>
+                        </div>
+                        <p class="progress-text" id="progressText">解析中...</p>
+                    </div>
+
+                    <!-- 预览数据 -->
+                    <div class="preview-section hidden" id="previewSection">
+                        <h3>📊 数据预览</h3>
+                        <div class="preview-stats" id="previewStats"></div>
+                        <div class="preview-data" id="previewData"></div>
+                    </div>
+
+                    <!-- 错误信息 -->
+                    <div class="error-message hidden" id="errorMessage">
+                        <div class="error-icon">⚠️</div>
+                        <div class="error-text" id="errorText"></div>
+                    </div>
+
+                    <!-- 使用说明 -->
+                    <div class="import-instructions">
+                        <h4>📖 Excel格式说明</h4>
+                        <p>Excel文件应包含以下列（列名可以是中文或英文）：</p>
+                        <ul>
+                            <li><strong>单词/Word</strong>: 英文单词（必填）</li>
+                            <li><strong>中文/Translation</strong>: 中文释义（必填）</li>
+                            <li><strong>话题/Category</strong>: 单词分类（可选）</li>
+                            <li><strong>音标/Phonetic</strong>: 音标（可选）</li>
+                            <li><strong>例句/Example</strong>: 例句（可选）</li>
+                        </ul>
+                        <p class="hint-text">💡 提示：程序会自动识别列名，支持中英文列名</p>
+                    </div>
+                </div>
+
+                <div class="import-footer">
+                    <button class="btn-secondary" onclick="closeImportDialog()">取消</button>
+                    <button class="btn-primary" id="importBtn" onclick="startImport()" disabled>导入单词库</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 话题分类选择 -->
+        <div class="category-selection hidden" id="categorySelection">
+            <h2>🎯 选择单词话题 🎯</h2>
+            <div class="word-limit-section">
+                <label for="wordLimitInput">
+                    <span class="limit-icon">🔢</span>
+                    <span class="limit-label">单词数量：</span>
+                </label>
+                <input 
+                    type="number" 
+                    id="wordLimitInput" 
+                    class="word-limit-input" 
+                    placeholder="输入数量从全库随机选" 
+                    min="1"
+                    max="1000"
+                />
+                <span class="limit-hint">（输入数量后无需选话题）</span>
+            </div>
+            <div class="category-note">
+                💡 <strong>快速使用</strong>：直接输入数量（如 10、20）即可开始，系统将从全量词库随机选择单词<br/>
+                <span class="note-secondary">或者：不输入数量，选择话题学习该话题的所有单词 ✨</span>
+            </div>
+            <div class="category-grid" id="categoryGrid">
+                <!-- 动态生成话题分类 -->
+            </div>
+            <div class="action-buttons">
+                <button class="btn-secondary" onclick="backToMainMenu()">🔙 返回</button>
+                <button class="btn-primary" onclick="startLearning()">🚀 开始学习</button>
+            </div>
+        </div>
+
+        <!-- 背单词界面 -->
+        <div class="learn-mode hidden" id="learnMode">
+            <div class="word-card">
+                <div class="card-header">
+                    <button class="btn-icon" onclick="exitMode()">← 返回</button>
+                    <span class="card-counter" id="cardCounter">1/10</span>
+                </div>
+                <div class="word-display">
+                    <h1 class="word" id="currentWord">Loading...</h1>
+                    <button class="pronunciation-btn" onclick="playPronunciation()">🔊</button>
+                </div>
+                <div class="word-info">
+                    <p class="phonetic" id="phonetic"></p>
+                    <p class="translation" id="translation"></p>
+                    <p class="example" id="example"></p>
+                </div>
+                <div class="card-actions">
+                    <button class="btn-action" onclick="markAsKnown()">😊 认识</button>
+                    <button class="btn-action" onclick="markAsUnknown()">😕 不认识</button>
+                    <button class="btn-slash" onclick="slashCurrentWord()">⚡ 斩词</button>
+                    <button class="btn-primary" onclick="nextWord()">➡️ 下一个</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 检查模式界面 -->
+        <div class="test-mode hidden" id="testMode">
+            <div class="test-card">
+                <div class="card-header">
+                    <button class="btn-icon" onclick="exitMode()">← 返回</button>
+                    <span class="card-counter" id="testCounter">1/10</span>
+                    <span class="test-score">正确: <strong id="correctCount">0</strong></span>
+                </div>
+                <div class="test-question">
+                    <h2>请输入这个单词的拼写：</h2>
+                    <p class="test-translation" id="testTranslation">苹果</p>
+                    <button class="pronunciation-btn" onclick="playTestPronunciation()">🔊 听发音</button>
+                </div>
+                <div class="test-input-area">
+                    <input type="text" class="word-input" id="wordInput" placeholder="输入单词..." autocomplete="off">
+                    <button class="btn-primary" onclick="checkAnswer()">检查答案</button>
+                </div>
+                <div class="test-feedback hidden" id="testFeedback">
+                    <div class="feedback-content"></div>
+                    <button class="btn-primary" onclick="nextTestWord()">下一题 →</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 挑战模式界面 -->
+        <div class="challenge-mode hidden" id="challengeMode">
+            <div class="challenge-card">
+                <div class="card-header">
+                    <button class="btn-icon" onclick="exitMode()">← 返回</button>
+                    <span class="timer" id="timer">⏱️ 60s</span>
+                    <span class="challenge-score">得分: <strong id="challengeScore">0</strong></span>
+                </div>
+                <div class="challenge-question">
+                    <p class="challenge-translation" id="challengeTranslation">苹果</p>
+                    <button class="pronunciation-btn" onclick="playChallengePronunciation()">🔊</button>
+                </div>
+                <div class="challenge-input">
+                    <input type="text" class="word-input" id="challengeInput" placeholder="快速输入..." autocomplete="off">
+                </div>
+                <div class="challenge-stats">
+                    <span>连击: <strong id="combo">0</strong></span>
+                    <span>答对: <strong id="challengeCorrect">0</strong></span>
+                    <span>答错: <strong id="challengeWrong">0</strong></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 斩词管理界面 -->
+        <div class="slashed-manager hidden" id="slashedManager">
+            <div class="manager-content">
+                <div class="manager-header">
+                    <h2>⚔️ 斩词管理</h2>
+                    <button class="btn-close" onclick="closeSlashedManager()">✕</button>
+                </div>
+                
+                <div class="manager-body">
+                    <div class="manager-stats">
+                        <div class="stat-card">
+                            <div class="stat-icon">⚔️</div>
+                            <div class="stat-info">
+                                <div class="stat-value" id="totalSlashed">0</div>
+                                <div class="stat-label">已斩单词</div>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">📚</div>
+                            <div class="stat-info">
+                                <div class="stat-value" id="totalWords">0</div>
+                                <div class="stat-label">单词总数</div>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">📊</div>
+                            <div class="stat-info">
+                                <div class="stat-value" id="slashRate">0%</div>
+                                <div class="stat-label">完成率</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="manager-filter">
+                        <input type="text" id="searchSlashed" placeholder="🔍 搜索单词..." oninput="filterSlashedList()">
+                        <button class="btn-danger" onclick="confirmClearAll()">清空全部</button>
+                    </div>
+                    
+                    <div class="slashed-list" id="slashedList">
+                        <!-- 动态生成已斩单词列表 -->
+                    </div>
+                    
+                    <div class="empty-slashed hidden" id="emptySlashed">
+                        <div class="empty-icon">⚔️</div>
+                        <p>还没有斩过单词</p>
+                        <p class="empty-hint">在学习模式中点击"斩词"按钮标记已学会的单词</p>
+                    </div>
+                </div>
+                
+                <div class="manager-footer">
+                    <button class="btn-secondary" onclick="closeSlashedManager()">关闭</button>
+                    <button class="btn-primary" onclick="exportSlashedWords()">📥 导出数据</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 错词本管理界面 -->
+        <div class="wrong-book-manager hidden" id="wrongBookManager">
+            <div class="manager-content">
+                <div class="manager-header">
+                    <h2>📕 错词本</h2>
+                    <button class="btn-close" onclick="closeWrongBookManager()">✕</button>
+                </div>
+                
+                <div class="manager-body">
+                    <div class="manager-stats">
+                        <div class="stat-card wrong-stat-card">
+                            <div class="stat-icon">📕</div>
+                            <div class="stat-info">
+                                <div class="stat-value" id="totalWrong">0</div>
+                                <div class="stat-label">错误单词</div>
+                            </div>
+                        </div>
+                        <div class="stat-card wrong-stat-card">
+                            <div class="stat-icon">❌</div>
+                            <div class="stat-info">
+                                <div class="stat-value" id="totalWrongCount">0</div>
+                                <div class="stat-label">累计错误</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="wrongbook-actions">
+                        <div class="wrongbook-limit-section">
+                            <label for="wrongBookLimitInput">
+                                <span class="limit-icon">🔢</span>
+                                <span class="limit-label">练习数量：</span>
+                            </label>
+                            <input 
+                                type="number" 
+                                id="wrongBookLimitInput" 
+                                class="word-limit-input" 
+                                placeholder="不填则全部" 
+                                min="1"
+                            />
+                        </div>
+                        <button class="btn-primary btn-large" onclick="startWrongBookLearn()">
+                            📚 背诵错词
+                        </button>
+                        <button class="btn-primary btn-large" onclick="startWrongBookTest()">
+                            ✍️ 检查错词
+                        </button>
+                    </div>
+                    
+                    <div class="manager-filter">
+                        <input type="text" id="searchWrongWords" placeholder="🔍 搜索单词..." oninput="filterWrongWordsList()">
+                        <button class="btn-danger" onclick="confirmClearWrongBook()">清空全部</button>
+                    </div>
+                    
+                    <div class="slashed-list" id="wrongWordsList">
+                        <!-- 动态生成错词列表 -->\n                    </div>
+                    
+                    <div class="empty-slashed hidden" id="emptyWrongBook">
+                        <div class="empty-icon">📕</div>
+                        <p>错词本是空的</p>
+                        <p class="empty-hint">答错的单词会自动添加到错词本中</p>
+                    </div>
+                </div>
+                
+                <div class="manager-footer">
+                    <button class="btn-secondary" onclick="closeWrongBookManager()">关闭</button>
+                    <button class="btn-primary" onclick="exportWrongWords()">📥 导出数据</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 结果页面 -->
+        <div class="result-screen hidden" id="resultScreen">
+            <div class="result-card">
+                <h1 class="result-title">🎉 太棒啦！🌟</h1>
+                <div class="result-stats">
+                    <div class="stat-item">
+                        <span class="stat-label">⭐ 总得分</span>
+                        <span class="stat-value" id="finalScore">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">💯 正确率</span>
+                        <span class="stat-value" id="accuracy">0%</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">📚 完成单词</span>
+                        <span class="stat-value" id="completedWords">0</span>
+                    </div>
+                </div>
+                <div class="result-actions">
+                    <button class="btn-primary" onclick="restartMode()">🔄 再来一次</button>
+                    <button class="btn-secondary" onclick="backToMainMenu()">🏠 返回主菜单</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 学习日历 -->
+        <div class="study-calendar hidden" id="studyCalendar">
+            <div class="calendar-content">
+                <div class="calendar-header">
+                    <h2>📅 学习日历</h2>
+                    <button class="btn-close" onclick="closeStudyCalendar()">✕</button>
+                </div>
+                
+                <div class="calendar-body">
+                    <!-- 统计信息 -->
+                    <div class="calendar-stats">
+                        <div class="calendar-stat-card">
+                            <div class="stat-icon">📅</div>
+                            <div class="stat-info">
+                                <div class="stat-value" id="totalStudyDays">0</div>
+                                <div class="stat-label">学习天数</div>
+                            </div>
+                        </div>
+                        <div class="calendar-stat-card">
+                            <div class="stat-icon">📚</div>
+                            <div class="stat-info">
+                                <div class="stat-value" id="totalStudyWords">0</div>
+                                <div class="stat-label">累计单词</div>
+                            </div>
+                        </div>
+                        <div class="calendar-stat-card">
+                            <div class="stat-icon">⭐</div>
+                            <div class="stat-info">
+                                <div class="stat-value" id="totalStudyScore">0</div>
+                                <div class="stat-label">总得分</div>
+                            </div>
+                        </div>
+                        <div class="calendar-stat-card">
+                            <div class="stat-icon">⏱️</div>
+                            <div class="stat-info">
+                                <div class="stat-value" id="totalStudyMinutes">0</div>
+                                <div class="stat-label">学习分钟</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 日历导航 -->
+                    <div class="calendar-nav">
+                        <h3 id="currentMonthYear">2025年 十一月</h3>
+                    </div>
+                    
+                    <!-- 日历网格 -->
+                    <div class="calendar-grid" id="calendarGrid">
+                        <!-- 动态生成 -->
+                    </div>
+                    
+                    <!-- 图例 -->
+                    <div class="calendar-legend">
+                        <div class="legend-item">
+                            <span class="legend-color today-color"></span>
+                            <span>今天</span>
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-color level-low-color"></span>
+                            <span>1-19词</span>
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-color level-medium-color"></span>
+                            <span>20-49词</span>
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-color level-high-color"></span>
+                            <span>50+词</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="calendar-footer">
+                    <button class="btn-secondary" onclick="closeStudyCalendar()">关闭</button>
+                    <button class="btn-primary" onclick="exportCalendarData()">📥 导出数据</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 日期详情面板 -->
+        <div class="day-detail-panel hidden" id="dayDetailPanel">
+            <div class="day-detail-content">
+                <div class="day-detail-header">
+                    <button class="btn-close" onclick="closeDayDetail()">✕</button>
+                </div>
+                <div id="dayDetailContent">
+                    <!-- 动态生成 -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 引入Excel解析库 -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <script src="app.js"></script>
+    <script src="calendar-functions.js"></script>
+</body>
+</html>
