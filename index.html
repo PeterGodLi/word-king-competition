@@ -3,9 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>单词王比赛 - 小学生英语学习平台</title>
-    <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="calendar-styles.css">
+    <link rel="stylesheet" href="/styles.css">
+    <link rel="stylesheet" href="/calendar-styles.css">
+    <style>
+        /* 防止样式加载失败时的回退样式 */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #FFD93D 0%, #6BCF7F 50%, #4D96FF 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .container {
+            width: 100%;
+            max-width: 1200px;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -469,7 +486,9 @@
 
     <!-- 引入Excel解析库 -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-    <script src="app.js"></script>
-    <script src="calendar-functions.js"></script>
+    <!-- 引入单词数据库 -->
+    <script src="/words.js"></script>
+    <script src="/app.js"></script>
+    <script src="/calendar-functions.js"></script>
 </body>
 </html>

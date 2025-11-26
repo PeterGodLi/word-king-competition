@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>样式测试页面</title>
+    <link rel="stylesheet" href="/styles.css">
+    <link rel="stylesheet" href="/calendar-styles.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1 class="logo">⚡ 样式测试 ✨</h1>
+        </header>
+
+        <div class="main-menu">
+            <h2>✨ 样式加载测试 ✨</h2>
+            <div class="mode-buttons">
+                <button class="mode-btn learn-btn">
+                    📚 测试按钮1
+                    <span class="mode-desc">如果看到渐变色和动画，说明样式正常</span>
+                </button>
+                <button class="mode-btn test-btn">
+                    ✍️ 测试按钮2
+                    <span class="mode-desc">按钮应该有宝可梦主题色彩</span>
+                </button>
+            </div>
+        </div>
+
+        <div style="margin-top: 20px; padding: 20px; background: white; border-radius: 15px;">
+            <h3>检查清单：</h3>
+            <ul>
+                <li>✅ 背景应该是渐变色（黄-绿-蓝）</li>
+                <li>✅ 标题应该有发光效果</li>
+                <li>✅ 按钮应该有彩色渐变</li>
+                <li>✅ 鼠标悬停按钮应该有动画</li>
+                <li>✅ 字体应该是圆润的卡通风格</li>
+            </ul>
+            
+            <h3>调试信息：</h3>
+            <p>打开浏览器开发者工具（F12），检查：</p>
+            <ol>
+                <li><strong>Console</strong>: 查看是否有错误信息</li>
+                <li><strong>Network</strong>: 确认 styles.css 和 calendar-styles.css 都返回 200</li>
+                <li><strong>Elements</strong>: 检查 &lt;link&gt; 标签是否正确</li>
+            </ol>
+        </div>
+    </div>
+
+    <script>
+        // 检测样式是否加载
+        window.addEventListener('load', function() {
+            const body = document.body;
+            const computedStyle = window.getComputedStyle(body);
+            const background = computedStyle.background || computedStyle.backgroundColor;
+            
+            console.log('=== 样式加载检测 ===');
+            console.log('Body 背景:', background);
+            console.log('字体:', computedStyle.fontFamily);
+            
+            if (background.includes('gradient') || background.includes('linear')) {
+                console.log('✅ 样式加载成功！');
+                alert('✅ 样式加载成功！背景渐变已生效。');
+            } else {
+                console.log('❌ 样式可能未加载');
+                alert('❌ 警告：样式可能未正确加载，请检查 Network 面板');
+            }
+        });
+    </script>
+</body>
+</html>

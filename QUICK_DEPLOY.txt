@@ -1,0 +1,58 @@
+🚀 快速重新部署指南
+==================
+
+✅ 已完成的修复：
+1. ✓ 所有资源路径改为绝对路径（/styles.css, /app.js 等）
+2. ✓ 添加了 words.js 引用
+3. ✓ 添加了内联回退样式
+4. ✓ 优化了 vercel.json 配置
+5. ✓ 创建了缓存控制文件 _headers
+6. ✓ 创建了测试页面 test.html
+
+📦 需要部署的关键文件：
+- index.html (已修复)
+- styles.css
+- calendar-styles.css
+- app.js
+- calendar-functions.js
+- words.js (167KB - 确保上传)
+- vercel.json (已优化)
+- _headers (新增)
+- test.html (用于测试)
+
+🔄 立即重新部署：
+
+方法1️⃣: Vercel 网页控制台（最简单）
+  1. 访问 https://vercel.com
+  2. 登录并找到你的项目
+  3. 点击 "Deployments" 标签
+  4. 点击右上角 "..." → "Redeploy"
+  5. 等待部署完成（约 1-2 分钟）
+
+方法2️⃣: 上传新版本
+  1. 访问 https://vercel.com
+  2. 点击 "Add New..." → "Project"
+  3. 拖拽整个项目文件夹
+  4. 点击 "Deploy"
+
+✨ 验证步骤：
+  1. 访问 https://你的域名.vercel.app/test.html
+     → 应该看到彩色渐变背景和动画按钮
+  2. 访问 https://你的域名.vercel.app
+     → 应该看到完整的宝可梦主题界面
+  3. 按 F12 打开开发者工具
+     → Network 标签：所有文件应该显示 200 OK
+     → Console 标签：无红色错误
+
+🔍 如果还是有问题：
+  1. 强制刷新浏览器：Cmd+Shift+R (Mac) 或 Ctrl+Shift+R (Windows)
+  2. 用隐私模式打开（避免缓存影响）
+  3. 查看 FIXES_SUMMARY.md 获取详细故障排查
+
+💡 重要提示：
+  - words.js 文件较大 (167KB)，确保完整上传
+  - 所有 .css 和 .js 文件都需要上传
+  - 不要忽略 _headers 文件（没有扩展名）
+
+📞 需要帮助？
+  查看 DEPLOY.md 和 FIXES_SUMMARY.md 获取详细说明
